@@ -4,19 +4,15 @@ const ProductRouter = require('./router/ProductRouter');
 const BannerRouter = require('./router/BannerRouter');
 const AuthRouter = require('./router/AuthRouter');
 const LayoutRouter = require('./router/LayoutRouter');
+const ApplicationRouter = require('./router/ApplicationRouter')
+const NewsRouter = require('./router/NewsRouter')
+
 const cors = require('cors');
 const path = require('path');
 
 const app = express();
 connectDB();
-const  ProductRouter = require('./router/ProductRouter')
-const BannerRouter = require('./router/BannerRouter')
-const AuthRouter = require('./router/AuthRouter')
-const LayoutRouter = require('./router/LayoutRouter')
-const CategoryRouter = require('./router/CategoryRouter')
-const ApplicationRouter = require('./router/ApplicationRouter')
-const NewsRouter = require('./router/NewsRouter')
-connectDB()
+
 
 app.use('/api/v1/products', ProductRouter)
 app.use('/api/v1/banners', BannerRouter)
