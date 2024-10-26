@@ -1,5 +1,5 @@
 const express = require('express');
-const LayoutModel = require('../models/LayouModels'); // Assuming it's saved as LayoutModel.js
+const LayoutModel = require('../models/LayouModels');
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
@@ -14,10 +14,10 @@ if (!fs.existsSync(uploadDir)) {
 // Multer storage settings
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/layouts'); // Destination for uploaded files
+        cb(null, uploadDir); // Absolute path for destination
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname); // Filename with timestamp
+        cb(null, Date.now() + '-' + file.originalname); // Unique filename with timestamp
     }
 });
 
@@ -35,9 +35,8 @@ router.get('/', async (req, res) => {
 
 // Get layout by ID
 router.get('/:id', async (req, res) => {
-    const { id } = req.params;
     try {
-        const layout = await LayoutModel.findById(id);
+        const layout = await LayoutModel.findById(req.params.id);
         if (!layout) return res.status(404).json({ data: 'Layout not found' });
         res.status(200).json({ data: layout });
     } catch (err) {
@@ -45,18 +44,14 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Create a new layout
+// Create a new layout with image upload
 router.post('/create', upload.array('images', 5), async (req, res) => {
     const { title, description, layout_text_position, layout_images_position } = req.body;
-    const images = req.files.map(file => file.path);
+    const images = req.files.map(file => `/uploads/layouts/${file.filename}`); // Save relative path
 
     try {
         if (!title || !description || !layout_text_position || !layout_images_position) {
             return res.status(400).json({ data: 'All fields are required.' });
-        }
-
-        if (images.length < 1) {
-            return res.status(400).json({ data: 'At least one image must be uploaded.' });
         }
 
         const layout = new LayoutModel({
@@ -78,7 +73,7 @@ router.post('/create', upload.array('images', 5), async (req, res) => {
 router.put('/:id', upload.array('images', 5), async (req, res) => {
     const { id } = req.params;
     const { title, description, layout_text_position, layout_images_position } = req.body;
-    const images = req.files.map(file => file.path);
+    const newImages = req.files.map(file => `/uploads/layouts/${file.filename}`); // Save relative path
 
     try {
         // Find the layout by ID
@@ -91,7 +86,7 @@ router.put('/:id', upload.array('images', 5), async (req, res) => {
         layout.layout_text_position = layout_text_position || layout.layout_text_position;
         layout.layout_images_position = layout_images_position || layout.layout_images_position;
 
-        if (images.length > 0) {
+        if (newImages.length > 0) {
             // Delete old images from the filesystem
             layout.images.forEach(imagePath => {
                 const fullImagePath = path.join(__dirname, '../', imagePath);
@@ -99,7 +94,7 @@ router.put('/:id', upload.array('images', 5), async (req, res) => {
                     fs.unlinkSync(fullImagePath); // Remove old image file
                 }
             });
-            layout.images = images; // Set new images
+            layout.images = newImages; // Set new images
         }
 
         await layout.save();
@@ -111,10 +106,8 @@ router.put('/:id', upload.array('images', 5), async (req, res) => {
 
 // Delete a layout by ID
 router.delete('/:id', async (req, res) => {
-    const { id } = req.params;
-
     try {
-        const layout = await LayoutModel.findById(id);
+        const layout = await LayoutModel.findById(req.params.id);
         if (!layout) return res.status(404).json({ data: 'Layout not found' });
 
         // Delete associated images from the file system
@@ -125,7 +118,7 @@ router.delete('/:id', async (req, res) => {
             }
         });
 
-        await LayoutModel.findByIdAndDelete(id);
+        await LayoutModel.findByIdAndDelete(req.params.id);
         res.status(200).json({ data: 'Layout and associated images deleted successfully' });
     } catch (err) {
         res.status(500).json({ data: err.message });

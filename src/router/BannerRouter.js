@@ -13,7 +13,7 @@ if (!fs.existsSync(uploadDir)) {
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/banner');
+        cb(null, uploadDir); // Use absolute path here
     },
     filename: (req, file, cb) => {
         cb(null, Date.now() + '-' + file.originalname); 
@@ -34,9 +34,8 @@ router.get('/', async (req, res) => {
 
 // Get banner by ID
 router.get('/:id', async (req, res) => {
-    const { id } = req.params; // Use params instead of body for ID in GET request
     try {
-        const banner = await BannerModel.findById(id);
+        const banner = await BannerModel.findById(req.params.id);
         if (!banner) return res.status(404).json({ data: 'Banner not found' });
         res.status(200).json({ data: banner });
     } catch (err) {
@@ -46,25 +45,20 @@ router.get('/:id', async (req, res) => {
 
 // Delete banner by ID (with associated image deletion)
 router.delete('/:id', async (req, res) => {
-    const { id } = req.params; // Use params instead of body for id in DELETE route
     try {
-        // Find the banner by ID first to get the image paths
-        const banner = await BannerModel.findById(id);
-        if (!banner) {
-            return res.status(404).json({ data: 'Banner not found' });
-        }
+        const banner = await BannerModel.findById(req.params.id);
+        if (!banner) return res.status(404).json({ data: 'Banner not found' });
 
         // Delete associated images from the file system
-        const images = banner.images; // Assuming `images` is an array of file paths
-        images.forEach(imagePath => {
+        banner.images.forEach(imagePath => {
             const fullImagePath = path.join(__dirname, '../', imagePath);
             if (fs.existsSync(fullImagePath)) {
-                fs.unlinkSync(fullImagePath); // Remove the file
+                fs.unlinkSync(fullImagePath);
             }
         });
 
         // Delete the banner from the database
-        await BannerModel.findByIdAndDelete(id);
+        await BannerModel.findByIdAndDelete(req.params.id);
         res.status(200).json({ data: 'Banner and associated images deleted' });
     } catch (err) {
         res.status(500).json({ data: err.message });
@@ -74,22 +68,14 @@ router.delete('/:id', async (req, res) => {
 // Create a new banner with image upload
 router.post('/create', upload.array('images', 1), async (req, res) => {
     const { title, description } = req.body;
-    const images = req.files.map(file => file.path);
+    const images = req.files.map(file => `/uploads/banner/${file.filename}`); // Save relative path
 
     try {
         if (!title || !description) {
             return res.status(400).json({ data: 'Title and description are required.' });
         }
 
-        if (images.length < 1) {
-            return res.status(400).json({ data: 'You must upload at least one image.' });
-        }
-
-        const banner = new BannerModel({ 
-            title, 
-            description, 
-            images 
-        });
+        const banner = new BannerModel({ title, description, images });
         await banner.save();
         res.status(201).json({ data: banner });
     } catch (err) {
@@ -98,5 +84,3 @@ router.post('/create', upload.array('images', 1), async (req, res) => {
 });
 
 module.exports = router;
-
-// banner models
