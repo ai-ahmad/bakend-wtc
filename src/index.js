@@ -2,6 +2,7 @@ const express = require('express');
 const connectDB = require('./config/db');
 const ProductRouter = require('./router/ProductRouter');
 const BannerRouter = require('./router/BannerRouter');
+const CategoryRouter = require('./router/CategoryRouter');
 const AuthRouter = require('./router/AuthRouter');
 const LayoutRouter = require('./router/LayoutRouter');
 const ApplicationRouter = require('./router/ApplicationRouter')
