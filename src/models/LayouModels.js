@@ -8,19 +8,19 @@ const LayoutSchema = new mongoose.Schema({
     },
     images: {
         type: [String], 
-        required: true
+        required: false
     },
     title: {
         type: [String], 
-        required: true
+        required: false
     },
     badges: {
         type: [String], 
-        required: true
+        required: false
     },
     description: {
         type: [String], 
-        required: true
+        required: false
     }
 });
 const Layout = mongoose.model('Layout', LayoutSchema);
