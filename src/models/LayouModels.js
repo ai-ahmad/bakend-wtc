@@ -1,33 +1,27 @@
 const mongoose = require('mongoose');
 
-// Define the layout schema
 const LayoutSchema = new mongoose.Schema({
-    images: {
-        type: [String], // Array of image URLs or file paths
-        required: true
+    sectionTheme: {
+        type: [String], 
+        required: true,
+        enum: ['lemarc1', 'lemarc2', 'lemarc3', 'lemarc4', 'lemarc5', 'lemarc6'] 
     },
-    description: {
-        type: String,
+    images: {
+        type: [String], 
         required: true
     },
     title: {
-        type: String,
+        type: [String], 
         required: true
     },
-    layout_text_position: {
-        type: String,
-        required: true,
-        enum: ['left', 'right'] // Restrict the position to 'left' or 'right'
+    badges: {
+        type: [String], 
+        required: true
     },
-    layout_images_position: {
-        type: String,
-        required: true,
-        enum: ['left', 'right'] // Restrict the position to 'left' or 'right'
+    description: {
+        type: [String], 
+        required: true
     }
 });
-
-// Create the model using the schema
 const Layout = mongoose.model('Layout', LayoutSchema);
-
-// Export the model for use in other parts of your application
 module.exports = Layout;

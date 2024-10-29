@@ -46,17 +46,19 @@ router.get('/:id', async (req, res) => {
 
 // Create a new layout with image upload
 router.post('/create', upload.array('images', 5), async (req, res) => {
-    const { title, description, layout_text_position, layout_images_position } = req.body;
+    const { sectionTheme, title, badges, description, layout_text_position, layout_images_position } = req.body;
     const images = req.files.map(file => `/uploads/layouts/${file.filename}`); // Save relative path
 
     try {
-        if (!title || !description || !layout_text_position || !layout_images_position) {
+        if (!sectionTheme || !title || !description || !layout_text_position || !layout_images_position) {
             return res.status(400).json({ data: 'All fields are required.' });
         }
 
         const layout = new LayoutModel({
-            title,
-            description,
+            sectionTheme: Array.isArray(sectionTheme) ? sectionTheme : [sectionTheme],
+            title: Array.isArray(title) ? title : [title],
+            badges: Array.isArray(badges) ? badges : [badges],
+            description: Array.isArray(description) ? description : [description],
             layout_text_position,
             layout_images_position,
             images
@@ -72,7 +74,7 @@ router.post('/create', upload.array('images', 5), async (req, res) => {
 // Update an existing layout by ID
 router.put('/:id', upload.array('images', 5), async (req, res) => {
     const { id } = req.params;
-    const { title, description, layout_text_position, layout_images_position } = req.body;
+    const { sectionTheme, title, badges, description, layout_text_position, layout_images_position } = req.body;
     const newImages = req.files.map(file => `/uploads/layouts/${file.filename}`); // Save relative path
 
     try {
@@ -81,8 +83,10 @@ router.put('/:id', upload.array('images', 5), async (req, res) => {
         if (!layout) return res.status(404).json({ data: 'Layout not found' });
 
         // Update fields
-        layout.title = title || layout.title;
-        layout.description = description || layout.description;
+        layout.sectionTheme = sectionTheme ? (Array.isArray(sectionTheme) ? sectionTheme : [sectionTheme]) : layout.sectionTheme;
+        layout.title = title ? (Array.isArray(title) ? title : [title]) : layout.title;
+        layout.badges = badges ? (Array.isArray(badges) ? badges : [badges]) : layout.badges;
+        layout.description = description ? (Array.isArray(description) ? description : [description]) : layout.description;
         layout.layout_text_position = layout_text_position || layout.layout_text_position;
         layout.layout_images_position = layout_images_position || layout.layout_images_position;
 
