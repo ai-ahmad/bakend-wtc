@@ -15,14 +15,6 @@ const app = express();
 connectDB();
 
 
-app.use('/api/v1/products', ProductRouter)
-app.use('/api/v1/banners', BannerRouter)
-app.use('/api/v1/upload', express.static('uploads'))
-app.use('/api/v1/layout', LayoutRouter)
-app.use('/api/v1/auth', AuthRouter)
-app.use('/api/v1/applications', ApplicationRouter)
-app.use('/api/v1/categories', CategoryRouter)
-app.use('/ap1/v1/news', NewsRouter)
 
 const corsOptions = {
     origin: 'http://localhost:3000', // frontend domain
@@ -30,7 +22,17 @@ const corsOptions = {
     credentials: true,
     optionsSuccessStatus: 204
 };
+
 app.use(cors(corsOptions));
+app.use('/api/v1/products', ProductRouter)
+app.use('/api/v1/banners', BannerRouter)
+app.use('/api/v1/upload', express.static('uploads'))
+app.use('/api/v1/layout', LayoutRouter)
+app.use('/api/v1/auth', AuthRouter)
+app.use('/api/v1/applications', ApplicationRouter)
+app.use('/api/v1/categories', CategoryRouter)
+app.use('/api/v1/news', NewsRouter)
+
 
 // Middleware for parsing JSON
 app.use(express.json());
