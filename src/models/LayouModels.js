@@ -23,5 +23,5 @@ const LayoutSchema = new mongoose.Schema({
         required: false
     }
 });
-const Layout = mongoose.model('Layout', LayoutSchema);
+const Layout = mongoose.model('LayoutWTC', LayoutSchema);
 module.exports = Layout;
