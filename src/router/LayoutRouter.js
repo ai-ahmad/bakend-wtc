@@ -11,6 +11,9 @@ if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
+
+
+
 // Multer storage settings
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -47,7 +50,7 @@ router.get('/:id', async (req, res) => {
 // Create a new layout with image upload
 router.post('/create', upload.array('images', 5), async (req, res) => {
     const { sectionTheme, title, badges, description, layout_text_position, layout_images_position } = req.body;
-    const images = req.files.map(file => `/uploads/layouts/${file.filename}`); // Save relative path
+    const images = req.files.map(file => `/uploads/layouts/${file.filename}`);
 
     try {
         if (!sectionTheme || !title || !description || !layout_text_position || !layout_images_position) {
