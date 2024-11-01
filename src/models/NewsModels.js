@@ -2,11 +2,15 @@ const mongoose = require('mongoose');
 
 const NewsSchema = mongoose.Schema({
     images: {
-        type: [],
+        type: Array, 
         required: true
     },
-    nwes_type: {
+    news_type: { // Corrected typo here
         type: String,
+        required: true
+    },
+    data: {
+        type: Date,
         required: true
     },
     title: {
@@ -17,8 +21,6 @@ const NewsSchema = mongoose.Schema({
         type: String,
         required: true
     }
-})
+});
 
-
-    
 module.exports = mongoose.model('NewsWTC', NewsSchema);
