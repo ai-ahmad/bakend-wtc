@@ -1,8 +1,6 @@
-const { application } = require('express');
 const mongoose = require('mongoose');
 
-
-const ApplicationSchmea = mongoose.Schema({
+const ApplicationSchema = new mongoose.Schema({
     full_name: {
         type: String,
         required: true
@@ -23,7 +21,6 @@ const ApplicationSchmea = mongoose.Schema({
         type: String,
         required: true
     }
+});
 
-})
-
-module.exports = mongoose.model('Application', ApplicationSchmea);
+module.exports = mongoose.model('Application', ApplicationSchema);

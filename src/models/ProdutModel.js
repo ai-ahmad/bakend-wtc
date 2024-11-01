@@ -29,7 +29,7 @@ const productSchema = new mongoose.Schema({
   },
   image: {
     main_images: {
-      type: [String],  // Array of image paths for main images
+      type: [String], 
       required: true,
     },
     all_images: {
