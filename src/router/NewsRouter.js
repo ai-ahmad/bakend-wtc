@@ -3,10 +3,10 @@ const router = express.Router();
 const NewsWTC = require('../models/NewsModels'); 
 
 // Create a new news article
-router.post('/', async (req, res) => {
+router.post('/create', async (req, res) => {
     const news = new NewsWTC({
         images: req.body.images,
-        date: req.body.date,
+        nwes_type: req.body.nwes_type,
         title: req.body.title,
         descriptions: req.body.descriptions
     });
@@ -39,8 +39,8 @@ router.patch('/:id', getNews, async (req, res) => {
     if (req.body.images != null) {
         res.news.images = req.body.images;
     }
-    if (req.body.date != null) {
-        res.news.date = req.body.date;
+    if (req.body.nwes_type != null) {
+        res.news.nwes_type = req.body.nwes_type;
     }
     if (req.body.title != null) {
         res.news.title = req.body.title;

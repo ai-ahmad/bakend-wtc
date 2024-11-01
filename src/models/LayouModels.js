@@ -28,6 +28,8 @@ const LayoutAbout1 = mongoose.Schema({
 });
 
 // Layout for About 2
+
+
 const LayoutAbout2 = mongoose.Schema({
     description: {
         type: String,
@@ -66,7 +68,7 @@ const LayoutAbout3 = mongoose.Schema({
     },
     images: {
         type: Array,
-        required: true,
+        required: true,4
     },
     buttons: {
         type: [{ btnText: String, btnLink: String }],
@@ -258,6 +260,55 @@ const LayoutAbout10 = mongoose.Schema({
     }
 });
 
+
+
+// Layout for Contact 1
+
+const LayouContact1 = mongoose.Schema({
+    title: {
+        type: String,
+        required: true,
+    },
+    description: {
+        type: String,
+        required: true,
+    },
+    contactInfo: {
+        type: { email: String, phone: String },
+    },
+    map: {
+        type: String,
+    },
+    layout_contact: {
+        type: String,
+        default: "lemarc1"
+    }
+})
+
+
+const LayouContact2 = mongoose.Schema({
+    title: {
+        type: String,
+        required: true,
+    },
+    description: {
+        type: String,
+        required: true,
+    },
+    contactInfo: {
+        type: { email: String, phone: String },
+    },
+    map: {
+        type: String,
+    },
+    formFields: {
+        type: [{ fieldName: String, fieldType: String }],
+    },
+    layout_contact: {
+        type: String,
+        default: "lemarc2"
+    }
+})
 
 
 module.exports = mongoose.model('LayoutAbout1',LayoutAbout1 )

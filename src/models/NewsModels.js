@@ -5,8 +5,8 @@ const NewsSchema = mongoose.Schema({
         type: [],
         required: true
     },
-    date: {
-        type: Date,
+    nwes_type: {
+        type: String,
         required: true
     },
     title: {
