@@ -15,15 +15,14 @@ connectDB();
 
 
 
-
 const corsOptions = {
-    origin: 'http://localhost:3000', 
+    origin: 'http://localhost:3000', // frontend domain
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
     optionsSuccessStatus: 204
 };
+
 app.use(cors(corsOptions));
-app.use(express.json());
 app.use('/api/v1/products', ProductRouter)
 app.use('/api/v1/banners', BannerRouter)
 app.use('/api/v1/upload', express.static('uploads'))
