@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const NewsWTC = require('../models/NewsModels'); 
+const NewsWTC = require('../models/NewsModels');
 
 // Create a new news article
 router.post('/create', async (req, res) => {
     const news = new NewsWTC({
         images: req.body.images,
-        nwes_type: req.body.nwes_type,
+        news_type: req.body.news_type, // Corrected typo here
         title: req.body.title,
+        data: req.body.data,
         descriptions: req.body.descriptions
     });
 
@@ -39,14 +40,17 @@ router.patch('/:id', getNews, async (req, res) => {
     if (req.body.images != null) {
         res.news.images = req.body.images;
     }
-    if (req.body.nwes_type != null) {
-        res.news.nwes_type = req.body.nwes_type;
+    if (req.body.news_type != null) { // Corrected typo here
+        res.news.news_type = req.body.news_type;
     }
     if (req.body.title != null) {
         res.news.title = req.body.title;
     }
     if (req.body.descriptions != null) {
         res.news.descriptions = req.body.descriptions;
+    }
+    if (req.body.data != null) {
+        res.news.data = req.body.data;
     }
 
     try {
