@@ -1,12 +1,27 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
 const NewsWTC = require('../models/NewsModels');
 
-// Create a new news article
-router.post('/create', async (req, res) => {
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './uploads/news'); 
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`); 
+    }
+}); 
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 } 
+});
+router.post('/create', upload.array('images', 5), async (req, res) => { 
+    const imagePaths = req.files.map(file => file.path); 
+
     const news = new NewsWTC({
-        images: req.body.images,
-        news_type: req.body.news_type, // Corrected typo here
+        images: imagePaths,
+        news_type: req.body.news_type,
         title: req.body.title,
         data: req.body.data,
         descriptions: req.body.descriptions
@@ -20,7 +35,6 @@ router.post('/create', async (req, res) => {
     }
 });
 
-// Get all news articles
 router.get('/', async (req, res) => {
     try {
         const newsArticles = await NewsWTC.find();
@@ -30,17 +44,16 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Get a single news article by ID
 router.get('/:id', getNews, (req, res) => {
     res.status(200).json(res.news);
 });
 
-// Update a news article by ID
-router.patch('/:id', getNews, async (req, res) => {
-    if (req.body.images != null) {
-        res.news.images = req.body.images;
+router.patch('/:id', upload.array('images', 5), getNews, async (req, res) => {
+    if (req.files && req.files.length > 0) {
+        const imagePaths = req.files.map(file => file.path);
+        res.news.images = imagePaths;
     }
-    if (req.body.news_type != null) { // Corrected typo here
+    if (req.body.news_type != null) {
         res.news.news_type = req.body.news_type;
     }
     if (req.body.title != null) {
@@ -60,8 +73,6 @@ router.patch('/:id', getNews, async (req, res) => {
         res.status(400).json({ message: err.message });
     }
 });
-
-// Delete a news article by ID
 router.delete('/:id', getNews, async (req, res) => {
     try {
         await res.news.remove();
@@ -70,7 +81,6 @@ router.delete('/:id', getNews, async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
-
 async function getNews(req, res, next) {
     let news;
     try {
@@ -85,5 +95,4 @@ async function getNews(req, res, next) {
     res.news = news;
     next();
 }
-
 module.exports = router;

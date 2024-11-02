@@ -68,7 +68,7 @@ const LayoutAbout3 = mongoose.Schema({
     },
     images: {
         type: Array,
-        required: true,4
+        required: true,
     },
     buttons: {
         type: [{ btnText: String, btnLink: String }],
