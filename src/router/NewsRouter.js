@@ -1,12 +1,31 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
 const NewsWTC = require('../models/NewsModels');
 
-// Create a new news article
-router.post('/create', async (req, res) => {
+// Set up multer storage configuration
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './uploads/news'); // Set the directory to save images
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`); // Name the file with a timestamp and original name
+    }
+}); 
+
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 } // Limit file size to 5 MB
+});
+
+// Create a new news article with image upload
+router.post('/create', upload.array('images', 5), async (req, res) => { // Allow up to 5 images
+    const imagePaths = req.files.map(file => file.path); // Store image file paths
+
     const news = new NewsWTC({
-        images: req.body.images,
-        news_type: req.body.news_type, // Corrected typo here
+        images: imagePaths,
+        news_type: req.body.news_type,
         title: req.body.title,
         data: req.body.data,
         descriptions: req.body.descriptions
@@ -36,11 +55,12 @@ router.get('/:id', getNews, (req, res) => {
 });
 
 // Update a news article by ID
-router.patch('/:id', getNews, async (req, res) => {
-    if (req.body.images != null) {
-        res.news.images = req.body.images;
+router.patch('/:id', upload.array('images', 5), getNews, async (req, res) => {
+    if (req.files && req.files.length > 0) {
+        const imagePaths = req.files.map(file => file.path);
+        res.news.images = imagePaths;
     }
-    if (req.body.news_type != null) { // Corrected typo here
+    if (req.body.news_type != null) {
         res.news.news_type = req.body.news_type;
     }
     if (req.body.title != null) {
@@ -71,6 +91,7 @@ router.delete('/:id', getNews, async (req, res) => {
     }
 });
 
+// Middleware to get news by ID
 async function getNews(req, res, next) {
     let news;
     try {
