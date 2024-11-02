@@ -4,7 +4,6 @@ const ProductRouter = require('./router/ProductRouter');
 const BannerRouter = require('./router/BannerRouter');
 const CategoryRouter = require('./router/CategoryRouter');
 const AuthRouter = require('./router/AuthRouter');
-const LayoutRouterAbout = require('./router/LayoutAboutRouter');
 const ApplicationRouter = require('./router/ApplicationRouter')
 const NewsCategoryRouter = require('./router/NewsCategoryModel')
 const NewsRouter = require('./router/NewsRouter')
