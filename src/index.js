@@ -4,8 +4,9 @@ const ProductRouter = require('./router/ProductRouter');
 const BannerRouter = require('./router/BannerRouter');
 const CategoryRouter = require('./router/CategoryRouter');
 const AuthRouter = require('./router/AuthRouter');
-const LayoutRouter = require('./router/LayoutRouter');
+const LayoutRouterAbout = require('./router/LayoutAboutRouter');
 const ApplicationRouter = require('./router/ApplicationRouter')
+const NewsCategoryRouter = require('./router/NewsCategoryModel')
 const NewsRouter = require('./router/NewsRouter')
 
 const cors = require('cors');
@@ -25,9 +26,9 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use('/api/v1/products', ProductRouter)
+app.use('/api/v1/news-category', NewsCategoryRouter)
 app.use('/api/v1/banners', BannerRouter)
 app.use('/api/v1/upload', express.static('uploads'))
-app.use('/api/v1/layout', LayoutRouter)
 app.use('/api/v1/auth', AuthRouter)
 app.use('/api/v1/applications', ApplicationRouter)
 app.use('/api/v1/categories', CategoryRouter)
