@@ -7,6 +7,7 @@ const AuthRouter = require('./router/AuthRouter');
 const ApplicationRouter = require('./router/ApplicationRouter')
 const NewsCategoryRouter = require('./router/NewsCategoryModel')
 const NewsRouter = require('./router/NewsRouter')
+const layoutRoutes = require('./router/LayoutRouter');
 
 const cors = require('cors');
 const path = require('path');
@@ -23,6 +24,9 @@ const corsOptions = {
     optionsSuccessStatus: 204
 };
 
+app.use(express.json()); // For parsing application/json
+app.use(express.urlencoded({ extended: true }));
+
 app.use(cors(corsOptions));
 app.use('/api/v1/products', ProductRouter)
 app.use('/api/v1/news-category', NewsCategoryRouter)
@@ -31,11 +35,11 @@ app.use('/api/v1/upload', express.static('uploads'))
 app.use('/api/v1/auth', AuthRouter)
 app.use('/api/v1/applications', ApplicationRouter)
 app.use('/api/v1/categories', CategoryRouter)
+app.use('/api/layouts', layoutRoutes);
 app.use('/api/v1/news', NewsRouter)
 
 
 // Middleware for parsing JSON
-app.use(express.json());
 
 // Serve static files for the "uploads" folder
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

@@ -1,11 +1,10 @@
 const mongoose = require('mongoose');
 
-
-const CategroyNewsSchema = mongoose.Schema({
+const CategoryNewsSchema = new mongoose.Schema({
     category_name: {
         type: String,
         required: true
     }
-})
+});
 
-module.exports = mongoose.model('CategoryNews', CategroyNewsSchema)
+module.exports = mongoose.model('CategoryNewsWTC', CategoryNewsSchema);
