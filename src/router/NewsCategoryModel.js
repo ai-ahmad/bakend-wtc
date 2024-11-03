@@ -3,7 +3,7 @@ const CategoryNewsModel = require('../models/NewsCategoryModels');
 const router = express.Router();
 
 // GET route to retrieve all news categories
-router.get('/', async (req, res) => { 
+router.get('/', async (req, res) => {
     try {
         const categoryData = await CategoryNewsModel.find();
         res.json(categoryData);
@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
 
 // POST route to create a new news category
 router.post('/create', async (req, res) => {
-    const { category_name } = req.body;
+    const { category_name } = req.body; // Make sure this field is passed in the request body
     try {
         const newCategory = new CategoryNewsModel({ category_name });
         await newCategory.save();
