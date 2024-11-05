@@ -3,7 +3,7 @@ const router = express.Router();
 const Category = require('../models/CategoryModels'); // Make sure the path is correct
 
 // Create a new category
-router.post('/', async (req, res) => {
+router.post('/create', async (req, res) => {
     const category = new Category({
         category_name: req.body.category_name,
     });
