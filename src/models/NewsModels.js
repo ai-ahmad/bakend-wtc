@@ -5,8 +5,9 @@ const NewsSchema = mongoose.Schema({
         type: Array, 
         required: true
     },
-    news_type: { // Corrected typo here
-        type: String,
+    news_type: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'CategoryNewsWTC', 
         required: true
     },
     data: {
