@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const NewsWTC = require('../models/NewsModels');
-const CategoryNewsWTC = require('../models/CategoryNewsModels'); // Import category model
+const CategoryNewsWTC = require('../models/NewsCategoryModels'); // Import category model
 
 // Set up multer storage configuration
 const storage = multer.diskStorage({
@@ -36,7 +36,7 @@ router.post('/create', upload.array('images', 5), async (req, res) => { // Allow
 
     const news = new NewsWTC({
         images: imagePaths,
-        news_type: req.body.news_type, // Referencing the category ID
+        news_type: req.body.news_type, 
         title: req.body.title,
         data: req.body.data,
         descriptions: req.body.descriptions
