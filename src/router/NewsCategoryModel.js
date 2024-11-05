@@ -1,5 +1,5 @@
 const express = require('express');
-const CategoryNewsModel = require('../models/CategoryModels');
+const CategoryNewsModel = require('../models/NewsCategoryModels');
 const router = express.Router();
 
 // GET route to retrieve all news categories
