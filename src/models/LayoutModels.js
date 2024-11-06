@@ -9,7 +9,7 @@ const layoutSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    "1_text": [
+    text1: [
         {
             number_text: {
                 type: String,
@@ -21,7 +21,7 @@ const layoutSchema = new mongoose.Schema({
             }
         }
     ],
-    "2_text": [
+    text2: [
         {
             number_text: {
                 type: String,
@@ -33,7 +33,7 @@ const layoutSchema = new mongoose.Schema({
             }
         }
     ],
-    "3_text": [
+    text3: [
         {
             number_text: {
                 type: String,
@@ -45,7 +45,7 @@ const layoutSchema = new mongoose.Schema({
             }
         }
     ],
-    "4_text": [
+    text4: [
         {
             number_text: {
                 type: String,
