@@ -5,6 +5,10 @@ const LayoutAbout3  = require('../models/LayouModels');
 const LayoutAbout4  = require('../models/LayouModels'); 
 const LayoutAbout5  = require('../models/LayouModels'); 
 const LayoutAbout6  = require('../models/LayouModels'); 
+const LayoutAbout7  = require('../models/LayouModels'); 
+const LayoutAbout8  = require('../models/LayouModels'); 
+const LayoutAbout9  = require('../models/LayouModels'); 
+const LayoutAbout10  = require('../models/LayouModels');
 
 const multer = require('multer');
 const fs = require('fs');
@@ -27,8 +31,28 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+router.get('/abouts', async (req, res) => {
+    try {
+        const layouts1 = await LayoutAbout1.find();
+        const layouts2 = await LayoutAbout2.find();
+        const layouts3 = await LayoutAbout3.find();
+        const layouts4 = await LayoutAbout4.find();
+        const layouts5 = await LayoutAbout5.find();
+        const layouts6 = await LayoutAbout6.find();
+        const layouts7 = await LayoutAbout7.find();
+        const layouts8 = await LayoutAbout8.find();
+        const layouts9 = await LayoutAbout9.find();
+        const layouts10 = await LayoutAbout10.find();
+        const all_layouts = [layouts1, layouts2, layouts3, layouts4, layouts5, layouts6, layouts7, layouts8, layouts9, layouts10];
+        res.status(200).json({ data: all_layouts });
+    } catch (err) {
+        res.status(500).json({ data: err.message });
+    }
+});
+
+
 // Get all LayoutAbout1 entries
-router.get('/layou/about/1', async (req, res) => {
+router.get('/layout/about/1', async (req, res) => {
     try {
         const layouts = await LayoutAbout1.find();
         res.status(200).json({ data: layouts });
@@ -38,7 +62,7 @@ router.get('/layou/about/1', async (req, res) => {
 });
 
 // Get LayoutAbout1 by ID
-router.get('/laoyu/about/1/:id', async (req, res) => {
+router.get('/laoyut/about/1/:id', async (req, res) => {
     try {
         const layout = await LayoutAbout1.findById(req.params.id);
         if (!layout) return res.status(404).json({ data: 'Layout not found' });

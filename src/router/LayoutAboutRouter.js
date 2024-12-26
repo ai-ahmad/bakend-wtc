@@ -33,6 +33,8 @@ const upload = multer({ storage: storage });
 
 // 1 layout
 
+
+
 router.get('/layou/about/1', async (req, res) => {
     try {
         const layouts = await LayoutAbout1.find();
