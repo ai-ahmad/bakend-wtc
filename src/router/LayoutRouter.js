@@ -52,7 +52,7 @@ router.get('/abouts', async (req, res) => {
 
 
 // Get all LayoutAbout1 entries
-router.get('/layout/about/1', async (req, res) => {
+router.get('/about/1', async (req, res) => {
     try {
         const layouts = await LayoutAbout1.find();
         res.status(200).json({ data: layouts });
@@ -62,7 +62,7 @@ router.get('/layout/about/1', async (req, res) => {
 });
 
 // Get LayoutAbout1 by ID
-router.get('/laoyut/about/1/:id', async (req, res) => {
+router.get('/about/1/:id', async (req, res) => {
     try {
         const layout = await LayoutAbout1.findById(req.params.id);
         if (!layout) return res.status(404).json({ data: 'Layout not found' });
@@ -73,7 +73,7 @@ router.get('/laoyut/about/1/:id', async (req, res) => {
 });
 
 // Create LayoutAbout1 with image upload
-router.post('/create/layout/about/1', upload.array('images', 5), async (req, res) => {
+router.post('/create/about/1', upload.array('images', 5), async (req, res) => {
     const { description, title, bg_color, buttons } = req.body;
     const images = req.files.map(file => `/uploads/layouts/${file.filename}`);
 
@@ -87,7 +87,7 @@ router.post('/create/layout/about/1', upload.array('images', 5), async (req, res
 });
 
 // Update LayoutAbout1 by ID
-router.put('/update/layout/about/1/:id', upload.array('images', 5), async (req, res) => {
+router.put('/update/about/1/:id', upload.array('images', 5), async (req, res) => {
     const { description, title, bg_color, buttons } = req.body;
     const newImages = req.files.map(file => `/uploads/layouts/${file.filename}`);
 
@@ -116,7 +116,7 @@ router.put('/update/layout/about/1/:id', upload.array('images', 5), async (req, 
 });
 
 // Delete LayoutAbout1 by ID
-router.delete('/update/laout/about/1/:id', async (req, res) => {
+router.delete('/update/about/1/:id', async (req, res) => {
     try {
         const layout = await LayoutAbout1.findById(req.params.id);
         if (!layout) return res.status(404).json({ data: 'Layout not found' });
