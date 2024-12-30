@@ -27,7 +27,7 @@ async function getCategory(req, res, next) {
 }
 
 // Create a new category
-router.post('/', async (req, res) => {
+router.post('/create', async (req, res) => {
     if (!req.body.category_name || req.body.category_name.trim() === '') {
         return res.status(400).json({ message: 'Category name is required' });
     }
