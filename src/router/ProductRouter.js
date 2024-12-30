@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const Product = require('../models/ProdutModel');  // Ensure the correct path here
+const Product = require('../models/ProdutModel'); // Ensure the correct path
 
 const router = express.Router();
 
@@ -21,7 +21,7 @@ if (!fs.existsSync(pdfDir)) {
 const storage = multer.diskStorage({
     destination(req, file, cb) {
         const uploadPath = file.mimetype === 'application/pdf' ? pdfDir : productImageDir;
-        cb(null, uploadPath);  
+        cb(null, uploadPath);
     },
     filename(req, file, cb) {
         const timestamp = Date.now();
@@ -32,29 +32,36 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // CREATE Product
-router.post('/create', upload.fields([{ name: 'images', maxCount: 5 }, { name: 'product_info_pdf', maxCount: 1 }]), async (req, res) => {
+router.post('/create', upload.fields([
+    { name: 'all_images', maxCount: 10 },
+    { name: 'main_images', maxCount: 1 },
+    { name: 'product_info_pdf', maxCount: 1 }
+]), async (req, res) => {
     const { name, category, rating, price, volume, description, discount_price, promotion, stock, ruler, oils_type, fidbek } = req.body;
 
-    // Collect file paths for the images and PDF
-    const images = req.files['images'] ? req.files['images'].map(file => `/uploads/product/${file.filename}`) : [];
-    const product_info_pdf = req.files['product_info_pdf'] ? `/uploads/pdf/${req.files['product_info_pdf'][0].filename}` : '';
+    const allImages = req.files['all_images'] ? req.files['all_images'].map(file => `/uploads/product/${file.filename}`) : [];
+    const mainImages = req.files['main_images'] ? req.files['main_images'].map(file => `/uploads/product/${file.filename}`) : [];
+    const productInfoPdf = req.files['product_info_pdf'] ? `/uploads/pdf/${req.files['product_info_pdf'][0].filename}` : '';
 
     try {
         const newProduct = new Product({
-            name, 
-            category, 
-            rating, 
-            price, 
-            volume, 
-            stock, 
-            ruler, 
-            description, 
-            fidbek, 
-            image: images,  // Store the array of image paths
-            product_info_pdf,  // Store the PDF path
+            name,
+            category,
+            rating,
+            price,
+            volume,
+            stock,
+            ruler,
+            description,
+            fidbek,
+            image: {
+                main_images: mainImages,
+                all_images: allImages,
+            },
+            product_info_pdf: productInfoPdf,
             discount_price,
             promotion,
-            oils_type
+            oils_type,
         });
 
         await newProduct.save();
@@ -86,30 +93,40 @@ router.get('/', async (req, res) => {
 });
 
 // UPDATE Product by ID
-router.put('/:id', upload.fields([{ name: 'image', maxCount: 1 }, { name: 'product_info_pdf', maxCount: 1 }]), async (req, res) => {
+router.put('/:id', upload.fields([
+    { name: 'all_images', maxCount: 10 },
+    { name: 'main_images', maxCount: 1 },
+    { name: 'product_info_pdf', maxCount: 1 }
+]), async (req, res) => {
     const { id } = req.params;
-    const { name, category, rating, price, volume, description, discount } = req.body;
+    const { name, category, rating, price, volume, description, discount_price, promotion, stock, ruler, oils_type } = req.body;
 
-    // Handle file uploads for both image and PDF
-    const image = req.files['image'] ? `/uploads/product/${req.files['image'][0].filename}` : null;
-    const product_info_pdf = req.files['product_info_pdf'] ? `/uploads/pdf/${req.files['product_info_pdf'][0].filename}` : null;
+    const allImages = req.files['all_images'] ? req.files['all_images'].map(file => `/uploads/product/${file.filename}`) : null;
+    const mainImages = req.files['main_images'] ? req.files['main_images'].map(file => `/uploads/product/${file.filename}`) : null;
+    const productInfoPdf = req.files['product_info_pdf'] ? `/uploads/pdf/${req.files['product_info_pdf'][0].filename}` : null;
 
     try {
         const updatedProduct = await Product.findByIdAndUpdate(
             id,
-            { 
-                name, 
-                category, 
-                rating, 
-                price, 
-                volume, 
-                image: image || undefined,  // Only update image if provided
-                product_info_pdf: product_info_pdf || undefined,  // Only update PDF if provided
-                description, 
-                discount 
+            {
+                name,
+                category,
+                rating,
+                price,
+                volume,
+                description,
+                discount_price,
+                promotion,
+                stock,
+                ruler,
+                oils_type,
+                ...(allImages && { 'image.all_images': allImages }),
+                ...(mainImages && { 'image.main_images': mainImages }),
+                ...(productInfoPdf && { product_info_pdf: productInfoPdf }),
             },
-            { new: true, omitUndefined: true }  // `omitUndefined` ensures only provided fields are updated
+            { new: true, omitUndefined: true } // `omitUndefined` ensures only provided fields are updated
         );
+
         if (!updatedProduct) return res.status(404).json({ message: 'Product not found' });
         res.status(200).json({ message: 'Product updated successfully', product: updatedProduct });
     } catch (error) {
@@ -132,8 +149,8 @@ router.delete('/:id', async (req, res) => {
 router.get('/filters', async (req, res) => {
     const { category_name } = req.query;
     try {
-        const products = category_name && category_name !== 'all' 
-            ? await Product.find({ category: category_name }) 
+        const products = category_name && category_name !== 'all'
+            ? await Product.find({ category: category_name })
             : await Product.find();
         res.status(200).json({ data: products });
     } catch (err) {

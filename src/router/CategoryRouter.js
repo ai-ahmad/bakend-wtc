@@ -1,11 +1,39 @@
 const express = require('express');
 const router = express.Router();
-const Category = require('../models/CategoryModels'); // Make sure the path is correct
+const Category = require('../models/CategoryModels'); // Ensure the path is correct
+const mongoose = require('mongoose');
+
+// Middleware to validate ObjectId
+function validateObjectId(req, res, next) {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).json({ message: 'Invalid category ID' });
+    }
+    next();
+}
+
+// Middleware to get category by ID
+async function getCategory(req, res, next) {
+    let category;
+    try {
+        category = await Category.findById(req.params.id);
+        if (!category) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+    res.category = category;
+    next();
+}
 
 // Create a new category
 router.post('/', async (req, res) => {
+    if (!req.body.category_name || req.body.category_name.trim() === '') {
+        return res.status(400).json({ message: 'Category name is required' });
+    }
+
     const category = new Category({
-        category_name: req.body.category_name,
+        category_name: req.body.category_name.trim(),
     });
 
     try {
@@ -27,14 +55,16 @@ router.get('/', async (req, res) => {
 });
 
 // Get a single category by ID
-router.get('/:id', getCategory, (req, res) => {
+router.get('/:id', validateObjectId, getCategory, (req, res) => {
     res.status(200).json(res.category);
 });
 
 // Update a category by ID
-router.patch('/:id', getCategory, async (req, res) => {
-    if (req.body.category_name != null) {
-        res.category.category_name = req.body.category_name;
+router.patch('/:id', validateObjectId, getCategory, async (req, res) => {
+    if (req.body.category_name && req.body.category_name.trim() !== '') {
+        res.category.category_name = req.body.category_name.trim();
+    } else {
+        return res.status(400).json({ message: 'Category name is required for update' });
     }
 
     try {
@@ -46,29 +76,16 @@ router.patch('/:id', getCategory, async (req, res) => {
 });
 
 // Delete a category by ID
-router.delete('/:id', getCategory, async (req, res) => {
+router.delete('/:id', validateObjectId, async (req, res) => {
     try {
-        await res.category.remove();
-        res.status(200).json({ message: 'Category deleted' });
+        const deletedCategory = await Category.findByIdAndDelete(req.params.id);
+        if (!deletedCategory) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
+        res.status(200).json({ message: 'Category deleted successfully' });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 });
-
-// Middleware to get category by ID
-async function getCategory(req, res, next) {
-    let category;
-    try {
-        category = await Category.findById(req.params.id);
-        if (category == null) {
-            return res.status(404).json({ message: 'Category not found' });
-        }
-    } catch (err) {
-        return res.status(500).json({ message: err.message });
-    }
-
-    res.category = category;
-    next();
-}
 
 module.exports = router;
