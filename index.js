@@ -6,6 +6,7 @@ const AuthRouter = require('./src/router/AuthRouter');
 const LayoutRouter = require('./src/router/LayoutAboutRouter');
 const ApplicationRouter = require('./src/router/ApplicationRouter')
 const NewsRouter = require('./src/router/NewsRouter')
+const LayoutTypeRouter = require('./src/router/La')
 const CategoryRouter = require('./src/router/CategoryRouter')
 const cors = require('cors');
 const path = require('path');
@@ -28,6 +29,7 @@ app.use(cors(corsOptions));
 app.use('/api/v1/products', ProductRouter)
 app.use('/api/v1/banners', BannerRouter)
 app.use('/api/v1/upload', express.static('uploads'))
+app.use('/api/v1/layout-type', LayoutTypeRouter)
 app.use('/api/v1/layout', LayoutRouter)
 app.use('/api/v1/auth', AuthRouter)
 app.use('/api/v1/applications', ApplicationRouter)
