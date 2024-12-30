@@ -46,14 +46,16 @@ router.patch('/:id', getNewsCategory, async (req, res) => {
 });
 
 // Delete a NewsCategory by ID
+// Delete a NewsCategory by ID
 router.delete('/:id', getNewsCategory, async (req, res) => {
     try {
-        await res.newsCategory.remove();
+        await res.newsCategory.deleteOne(); // Удаление категории
         res.status(200).json({ message: 'NewsCategory deleted successfully' });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 });
+
 
 // Middleware to get a single NewsCategory by ID
 async function getNewsCategory(req, res, next) {
