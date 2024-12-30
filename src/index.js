@@ -15,6 +15,8 @@ connectDB();
 
 
 
+
+
 const corsOptions = {
     origin: 'http://localhost:3000', // frontend domain
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
