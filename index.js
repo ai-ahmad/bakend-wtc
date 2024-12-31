@@ -16,10 +16,14 @@ connectDB();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors({
-  origin: ['http://localhost:3000', 'https://wts-admin-xyyj.vercel.app'],
-}));
-
+const corsOptions = {
+    origin: '*', // Allow all origins
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+    credentials: true, // If you need to include cookies
+  };
+  app.use(cors(corsOptions));
+  
 app.use('/api/v1/products', ProductRouter);
 app.use('/api/v1/banners', BannerRouter);
 app.use('/api/v1/news-type', NewsTypeRouter);
