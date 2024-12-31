@@ -18,12 +18,9 @@ connectDB();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const corsOptions = {
-    origin: 'http://localhost:3000', // frontend domain
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-    optionsSuccessStatus: 204
-};
+app.use(cors({
+  origin: ['http://localhost:3000', 'https://wts-admin-xyyj.vercel.app'],
+}));
 
 app.use(cors(corsOptions));
 app.use('/api/v1/products', ProductRouter)
