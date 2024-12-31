@@ -13,8 +13,6 @@ const path = require('path');
 const app = express();
 connectDB();
 
-
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -22,18 +20,15 @@ app.use(cors({
   origin: ['http://localhost:3000', 'https://wts-admin-xyyj.vercel.app'],
 }));
 
-app.use(cors(corsOptions));
-app.use('/api/v1/products', ProductRouter)
-app.use('/api/v1/banners', BannerRouter)
-app.use('/api/v1/news-type', NewsTypeRouter)
-app.use('/api/v1/upload', express.static('uploads'))
-app.use('/api/v1/auth', AuthRouter)
-app.use('/api/v1/applications', ApplicationRouter)
-app.use('/api/v1/categories', CategoryRouter)
-
-app.use('/api/v1/news', NewsRouter)
+app.use('/api/v1/products', ProductRouter);
+app.use('/api/v1/banners', BannerRouter);
+app.use('/api/v1/news-type', NewsTypeRouter);
+app.use('/api/v1/upload', express.static('uploads'));
+app.use('/api/v1/auth', AuthRouter);
+app.use('/api/v1/applications', ApplicationRouter);
+app.use('/api/v1/categories', CategoryRouter);
+app.use('/api/v1/news', NewsRouter);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
 
 const PORT = 9000;
 app.listen(PORT, () => {
