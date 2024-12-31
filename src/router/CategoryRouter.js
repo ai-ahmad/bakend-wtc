@@ -30,7 +30,7 @@ async function getCategory(req, res, next) {
 router.post('/create', async (req, res) => {
     if (!req.body.category_name || req.body.category_name.trim() === '') {
         return res.status(400).json({ message: 'Category name is required' });
-    }
+    }   
 
     const category = new Category({
         category_name: req.body.category_name.trim(),
