@@ -76,7 +76,7 @@ router.patch('/:id', upload.array('images', 5), getNews, async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
     try {
-        const deletedNews = await News.findByIdAndDelete(req.params.id);
+        const deletedNews = await NewsWTC.findByIdAndDelete(req.params.id);
         if (!deletedNews) {
             return res.status(404).json({ message: 'News article not found' });
         }
