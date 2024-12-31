@@ -73,9 +73,13 @@ router.patch('/:id', upload.array('images', 5), getNews, async (req, res) => {
         res.status(400).json({ message: err.message });
     }
 });
-router.delete('/:id', getNews, async (req, res) => {
+
+router.delete('/:id', async (req, res) => {
     try {
-        await res.news.remove();
+        const deletedNews = await News.findByIdAndDelete(req.params.id);
+        if (!deletedNews) {
+            return res.status(404).json({ message: 'News article not found' });
+        }
         res.status(200).json({ message: 'News article deleted' });
     } catch (err) {
         res.status(500).json({ message: err.message });

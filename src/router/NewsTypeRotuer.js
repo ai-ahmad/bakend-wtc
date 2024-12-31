@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const NewsCategory = require('../models/NewsCategoryModels'); // Adjust path as necessary
+const NewsCategory = require('../models/NewsCategoryModels');
 
 // Create a new NewsCategory
-router.post('/create', async (req, res) => {
+router.post('/', async (req, res) => {
     const newsCategory = new NewsCategory({
         type: req.body.type,
     });
@@ -27,18 +27,29 @@ router.get('/', async (req, res) => {
 });
 
 // Get a single NewsCategory by ID
-router.get('/:id', getNewsCategory, (req, res) => {
-    res.status(200).json(res.newsCategory);
+router.get('/:id', async (req, res) => {
+    try {
+        const category = await NewsCategory.findById(req.params.id);
+        if (!category) {
+            return res.status(404).json({ message: 'NewsCategory not found' });
+        }
+        res.status(200).json(category);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 });
 
 // Update a NewsCategory by ID
-router.patch('/:id', getNewsCategory, async (req, res) => {
-    if (req.body.type != null) {
-        res.newsCategory.type = req.body.type;
-    }
-
+router.put('/:id', async (req, res) => {
     try {
-        const updatedCategory = await res.newsCategory.save();
+        const updatedCategory = await NewsCategory.findByIdAndUpdate(
+            req.params.id,
+            { type: req.body.type },
+            { new: true } // Return the updated document
+        );
+        if (!updatedCategory) {
+            return res.status(404).json({ message: 'NewsCategory not found' });
+        }
         res.status(200).json(updatedCategory);
     } catch (err) {
         res.status(400).json({ message: err.message });
@@ -46,31 +57,16 @@ router.patch('/:id', getNewsCategory, async (req, res) => {
 });
 
 // Delete a NewsCategory by ID
-// Delete a NewsCategory by ID
-router.delete('/:id', getNewsCategory, async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
-        await res.newsCategory.deleteOne(); // Удаление категории
+        const deletedCategory = await NewsCategory.findByIdAndDelete(req.params.id);
+        if (!deletedCategory) {
+            return res.status(404).json({ message: 'NewsCategory not found' });
+        }
         res.status(200).json({ message: 'NewsCategory deleted successfully' });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 });
-
-
-// Middleware to get a single NewsCategory by ID
-async function getNewsCategory(req, res, next) {
-    let newsCategory;
-    try {
-        newsCategory = await NewsCategory.findById(req.params.id);
-        if (newsCategory == null) {
-            return res.status(404).json({ message: 'NewsCategory not found' });
-        }
-    } catch (err) {
-        return res.status(500).json({ message: err.message });
-    }
-
-    res.newsCategory = newsCategory;
-    next();
-}
 
 module.exports = router;
