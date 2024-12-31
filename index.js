@@ -30,6 +30,7 @@ app.use('/api/v1/upload', express.static('uploads'))
 app.use('/api/v1/auth', AuthRouter)
 app.use('/api/v1/applications', ApplicationRouter)
 app.use('/api/v1/categories', CategoryRouter)
+
 app.use('/api/v1/news', NewsRouter)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
