@@ -34,8 +34,13 @@ const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
-
-app.use('/uploads', express.static(uploadDir));
+app.use('/uploads', (req, res, next) => {
+  const filePath = path.join(__dirname, 'uploads', req.path);
+  if (!fs.existsSync(filePath)) {
+      return res.status(404).send('File not found');
+  }
+  next();
+}, express.static(path.join(__dirname, 'uploads')));
 
 // API routes
 app.use('/api/v1/products', ProductRouter);
@@ -47,7 +52,7 @@ app.use('/api/v1/categories', CategoryRouter);
 app.use('/api/v1/news', NewsRouter);
 
 // Route to retrieve list of files in uploads directory
-app.get('/api/v1/uploads', (req, res) => {
+app.get('/uploads', (req, res) => {
   const { folder } = req.query; // Optional query parameter to specify subfolder
   const directoryPath = folder ? path.join(uploadDir, folder) : uploadDir;
 
