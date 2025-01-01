@@ -5,8 +5,8 @@ const path = require('path');
 const fs = require('fs');
 const NewsWTC = require('../models/NewsModels');
 
-// Ensure the uploads/news directory exists
-const uploadsDir = '/uploads/news';
+// Resolve the correct path for uploads/news
+const uploadsDir = path.resolve(__dirname, './uploads/news');
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
