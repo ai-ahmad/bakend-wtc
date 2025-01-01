@@ -8,7 +8,7 @@ const path = require('path');
 // ========================
 //   Ensure Upload Dir
 // ========================
-const uploadDir = path.join(__dirname, '../uploads/banner');
+const uploadDir = path.join(__dirname, './uploads/banner');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
