@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const Product = require('../models/ProdutModel'); // Ensure the correct path
+const Product = require('../models/ProductModel'); // Ensure the correct path
 
 const router = express.Router();
 
@@ -29,7 +29,13 @@ const storage = multer.diskStorage({
     },
 });
 
-const upload = multer({ storage });
+const upload = multer({ 
+    storage,
+    fileFilter: (req, file, cb) => {
+        console.log('Received field:', file.fieldname); // Logs field names
+        cb(null, true);
+    } 
+});
 
 // CREATE Product
 router.post('/create', upload.fields([
@@ -37,6 +43,7 @@ router.post('/create', upload.fields([
     { name: 'main_images', maxCount: 1 },
     { name: 'product_info_pdf', maxCount: 1 }
 ]), async (req, res) => {
+    console.log('Incoming files:', req.files);
     const { name, category, rating, price, volume, description, discount_price, promotion, stock, ruler, oils_type, fidbek } = req.body;
 
     const allImages = req.files['all_images']
@@ -104,18 +111,13 @@ router.put('/:id', upload.fields([
     { name: 'main_images', maxCount: 1 },
     { name: 'product_info_pdf', maxCount: 1 }
 ]), async (req, res) => {
+    console.log('Incoming files:', req.files);
     const { id } = req.params;
     const { name, category, rating, price, volume, description, discount_price, promotion, stock, ruler, oils_type } = req.body;
 
-    const allImages = req.files['all_images']
-        ? req.files['all_images'].map(file => `/uploads/product/${file.filename}`)
-        : null;
-    const mainImages = req.files['main_images']
-        ? req.files['main_images'].map(file => `/uploads/product/${file.filename}`)
-        : null;
-    const productInfoPdf = req.files['product_info_pdf']
-        ? `/uploads/pdf/${req.files['product_info_pdf'][0].filename}`
-        : null;
+    const allImages = req.files['all_images'] ? req.files['all_images'].map(file => `/uploads/product/${file.filename}`) : null;
+    const mainImages = req.files['main_images'] ? req.files['main_images'].map(file => `/uploads/product/${file.filename}`) : null;
+    const productInfoPdf = req.files['product_info_pdf'] ? `/uploads/pdf/${req.files['product_info_pdf'][0].filename}` : null;
 
     try {
         const updatedProduct = await Product.findByIdAndUpdate(
