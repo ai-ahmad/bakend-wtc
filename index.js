@@ -13,9 +13,9 @@ const path = require('path');
 const app = express();
 connectDB();
 
-// Middleware для парсинга JSON
+
+
 app.use(express.json());
-// Middleware для парсинга данных формы
 app.use(express.urlencoded({ extended: true }));
 
 const corsOptions = {
