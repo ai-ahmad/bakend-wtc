@@ -67,7 +67,7 @@ router.get('/:id', async (req, res) => {
     description: <string>
     images: <files> (up to n)
 */
-router.post('/', upload.array('images', 5), async (req, res) => {
+router.post('/create', upload.array('images', 5), async (req, res) => {
   const { title, description } = req.body;
 
   // Build relative file paths for each image
