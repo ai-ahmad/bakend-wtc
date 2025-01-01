@@ -12,10 +12,14 @@ const storage = multer.diskStorage({
         cb(null, `${Date.now()}-${file.originalname}`); 
     }
 }); 
+
+
 const upload = multer({
     storage: storage,
     limits: { fileSize: 5 * 1024 * 1024 } 
 });
+
+
 router.post('/create', upload.array('images', 5), async (req, res) => { 
     const imagePaths = req.files.map(file => file.path); 
 
