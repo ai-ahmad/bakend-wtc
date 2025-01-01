@@ -7,8 +7,8 @@ const Product = require('../models/ProdutModel'); // Ensure the correct path
 const router = express.Router();
 
 // Ensure directories for uploads exist
-const productImageDir = path.join(__dirname, './uploads/product');
-const pdfDir = path.join(__dirname, './uploads/pdf');
+const productImageDir = path.join(__dirname, '../uploads/product');
+const pdfDir = path.join(__dirname, '../uploads/pdf');
 
 if (!fs.existsSync(productImageDir)) {
     fs.mkdirSync(productImageDir, { recursive: true });
