@@ -39,9 +39,18 @@ router.post('/create', upload.fields([
 ]), async (req, res) => {
     const { name, category, rating, price, volume, description, discount_price, promotion, stock, ruler, oils_type, fidbek } = req.body;
 
-    const allImages = req.files['all_images'] ? req.files['all_images'].map(file => `/uploads/product/${file.filename}`) : [];
-    const mainImages = req.files['main_images'] ? req.files['main_images'].map(file => `/uploads/product/${file.filename}`) : [];
-    const productInfoPdf = req.files['product_info_pdf'] ? `/uploads/pdf/${req.files['product_info_pdf'][0].filename}` : '';
+    // Проверяем файлы
+    const allImages = req.files['all_images']
+        ? req.files['all_images'].map(file => `/uploads/product/${file.filename}`)
+        : ['/uploads/product/default-image.jpg']; // Если нет файлов, использовать изображение по умолчанию.
+
+    const mainImages = req.files['main_images']
+        ? req.files['main_images'].map(file => `/uploads/product/${file.filename}`)
+        : ['/uploads/product/default-main.jpg']; // Изображение по умолчанию для главного изображения.
+
+    const productInfoPdf = req.files['product_info_pdf']
+        ? `/uploads/pdf/${req.files['product_info_pdf'][0].filename}`
+        : '/uploads/pdf/default-info.pdf'; // PDF по умолчанию.
 
     try {
         const newProduct = new Product({
@@ -70,6 +79,7 @@ router.post('/create', upload.fields([
         res.status(500).json({ message: 'Error creating product', error: error.message });
     }
 });
+
 
 // READ a single Product by ID
 router.get('/:id', async (req, res) => {
