@@ -7,8 +7,8 @@ const Product = require('../models/ProdutModel'); // Ensure the correct path
 const router = express.Router();
 
 // Ensure directories for uploads exist
-const productImageDir = path.join(__dirname, '../uploads/product');
-const pdfDir = path.join(__dirname, '../uploads/pdf');
+const productImageDir = path.join(__dirname, './uploads/product');
+const pdfDir = path.join(__dirname, './uploads/pdf');
 
 if (!fs.existsSync(productImageDir)) {
     fs.mkdirSync(productImageDir, { recursive: true });
@@ -25,7 +25,7 @@ const storage = multer.diskStorage({
     },
     filename(req, file, cb) {
         const timestamp = Date.now();
-        cb(null, `${timestamp}-${file.originalname}`);
+        cb(null, ${timestamp}-${file.originalname});
     },
 });
 
@@ -39,18 +39,9 @@ router.post('/create', upload.fields([
 ]), async (req, res) => {
     const { name, category, rating, price, volume, description, discount_price, promotion, stock, ruler, oils_type, fidbek } = req.body;
 
-    // Проверяем файлы
-    const allImages = req.files['all_images']
-        ? req.files['all_images'].map(file => `/uploads/product/${file.filename}`)
-        : ['/uploads/product/default-image.jpg']; // Если нет файлов, использовать изображение по умолчанию.
-
-    const mainImages = req.files['main_images']
-        ? req.files['main_images'].map(file => `/uploads/product/${file.filename}`)
-        : ['/uploads/product/default-main.jpg']; // Изображение по умолчанию для главного изображения.
-
-    const productInfoPdf = req.files['product_info_pdf']
-        ? `/uploads/pdf/${req.files['product_info_pdf'][0].filename}`
-        : '/uploads/pdf/default-info.pdf'; // PDF по умолчанию.
+    const allImages = req.files['all_images'] ? req.files['all_images'].map(file => /uploads/product/${file.filename}) : [];
+    const mainImages = req.files['main_images'] ? req.files['main_images'].map(file => /uploads/product/${file.filename}) : [];
+    const productInfoPdf = req.files['product_info_pdf'] ? /uploads/pdf/${req.files['product_info_pdf'][0].filename} : '';
 
     try {
         const newProduct = new Product({
@@ -79,7 +70,6 @@ router.post('/create', upload.fields([
         res.status(500).json({ message: 'Error creating product', error: error.message });
     }
 });
-
 
 // READ a single Product by ID
 router.get('/:id', async (req, res) => {
@@ -111,9 +101,9 @@ router.put('/:id', upload.fields([
     const { id } = req.params;
     const { name, category, rating, price, volume, description, discount_price, promotion, stock, ruler, oils_type } = req.body;
 
-    const allImages = req.files['all_images'] ? req.files['all_images'].map(file => `/uploads/product/${file.filename}`) : null;
-    const mainImages = req.files['main_images'] ? req.files['main_images'].map(file => `/uploads/product/${file.filename}`) : null;
-    const productInfoPdf = req.files['product_info_pdf'] ? `/uploads/pdf/${req.files['product_info_pdf'][0].filename}` : null;
+    const allImages = req.files['all_images'] ? req.files['all_images'].map(file => /uploads/product/${file.filename}) : null;
+    const mainImages = req.files['main_images'] ? req.files['main_images'].map(file => /uploads/product/${file.filename}) : null;
+    const productInfoPdf = req.files['product_info_pdf'] ? /uploads/pdf/${req.files['product_info_pdf'][0].filename} : null;
 
     try {
         const updatedProduct = await Product.findByIdAndUpdate(
@@ -134,7 +124,7 @@ router.put('/:id', upload.fields([
                 ...(mainImages && { 'image.main_images': mainImages }),
                 ...(productInfoPdf && { product_info_pdf: productInfoPdf }),
             },
-            { new: true, omitUndefined: true } // `omitUndefined` ensures only provided fields are updated
+            { new: true, omitUndefined: true } // omitUndefined ensures only provided fields are updated
         );
 
         if (!updatedProduct) return res.status(404).json({ message: 'Product not found' });
