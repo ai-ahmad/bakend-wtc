@@ -3,41 +3,69 @@ const connectDB = require('./src/config/db');
 const ProductRouter = require('./src/router/ProductRouter');
 const BannerRouter = require('./src/router/BannerRouter');
 const AuthRouter = require('./src/router/AuthRouter');
-const ApplicationRouter = require('./src/router/ApplicationRouter')
-const NewsRouter = require('./src/router/NewsRouter')
-const CategoryRouter = require('./src/router/CategoryRouter')
-const NewsTypeRouter = require('./src/router/NewsTypeRotuer')
+const ApplicationRouter = require('./src/router/ApplicationRouter');
+const NewsRouter = require('./src/router/NewsRouter');
+const CategoryRouter = require('./src/router/CategoryRouter');
+const NewsTypeRouter = require('./src/router/NewsTypeRotuer');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
+
+// Connect to the database
 connectDB();
 
-
-
+// Middleware to parse JSON and URL-encoded payloads
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// CORS configuration
 const corsOptions = {
-    origin: '*', // frontend domain
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-    optionsSuccessStatus: 204
+  origin: '*', // Allow all origins
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 };
-
 app.use(cors(corsOptions));
-app.use('/api/v1/products', ProductRouter)
-app.use('/api/v1/banners', BannerRouter)
-app.use('/api/v1/news-type', NewsTypeRouter)
-app.use('/api/v1/upload', express.static('uploads'))
-app.use('/api/v1/auth', AuthRouter)
-app.use('/api/v1/applications', ApplicationRouter)
-app.use('/api/v1/categories', CategoryRouter)
-app.use('/api/v1/news', NewsRouter)
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Static file serving for uploads
+const uploadDir = path.join(__dirname, 'uploads');
 
+// Ensure the uploads directory exists
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+app.use('/uploads', (req, res, next) => {
+  const filePath = path.join(__dirname, 'uploads', req.path);
+  if (!fs.existsSync(filePath)) {
+      return res.status(404).send('File not found');
+  }
+  next();
+}, express.static(path.join(__dirname, 'uploads')));
+
+// API routes
+app.use('/api/v1/products', ProductRouter);
+app.use('/api/v1/banners', BannerRouter);
+app.use('/api/v1/news-type', NewsTypeRouter);
+app.use('/api/v1/auth', AuthRouter);
+app.use('/api/v1/applications', ApplicationRouter);
+app.use('/api/v1/categories', CategoryRouter);
+app.use('/api/v1/news', NewsRouter);
+
+// Route to retrieve list of files in uploads directory
+app.get('/uploads', (req, res) => {
+  const { folder } = req.query; // Optional query parameter to specify subfolder
+  const directoryPath = folder ? path.join(uploadDir, folder) : uploadDir;
+
+  fs.readdir(directoryPath, (err, files) => {
+    if (err) {
+      return res.status(500).json({ message: 'Error reading directory', error: err.message });
+    }
+    res.status(200).json({ files });
+  });
+});
+
+// Start the server
 const PORT = 9000;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
