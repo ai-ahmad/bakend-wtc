@@ -31,11 +31,39 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 } 
 });
 
-// ===== CREATE News =====
+/**
+ * @swagger
+ * /news/create:
+ *   post:
+ *     summary: Create a new news article
+ *     tags: [News]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *               news_type:
+ *                 type: string
+ *               title:
+ *                 type: string
+ *               data:
+ *                 type: string
+ *               descriptions:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: The news article was successfully created
+ *       400:
+ *         description: Bad request
+ */
 router.post('/create', upload.array('images', 5), async (req, res) => { 
-  // Сохраняем физический путь (например "./uploads/news/..."), 
-  // но в БД обычно лучше хранить путь для отдачи, типа "/uploads/news/..."
-  // Поэтому можно заменить ниже на: `/uploads/news/${file.filename}`
   const imagePaths = req.files.map(file => `/uploads/news/${file.filename}`);
 
   const news = new NewsWTC({
@@ -54,7 +82,24 @@ router.post('/create', upload.array('images', 5), async (req, res) => {
   }
 });
 
-// ===== GET All News =====
+/**
+ * @swagger
+ * /news:
+ *   get:
+ *     summary: Get all news articles
+ *     tags: [News]
+ *     responses:
+ *       200:
+ *         description: List of all news articles
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/News'
+ *       500:
+ *         description: Error retrieving news articles
+ */
 router.get('/', async (req, res) => {
   try {
     const newsArticles = await NewsWTC.find();
@@ -64,15 +109,82 @@ router.get('/', async (req, res) => {
   }
 });
 
-// ===== GET News by ID =====
+/**
+ * @swagger
+ * /news/{id}:
+ *   get:
+ *     summary: Get a single news article by ID
+ *     tags: [News]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The ID of the news article
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: A single news article
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/News'
+ *       404:
+ *         description: News article not found
+ *       500:
+ *         description: Error retrieving news article
+ */
 router.get('/:id', getNews, (req, res) => {
   res.status(200).json(res.news);
 });
 
-// ===== UPDATE News (PATCH) =====
+/**
+ * @swagger
+ * /news/{id}:
+ *   patch:
+ *     summary: Update a news article by ID
+ *     tags: [News]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The ID of the news article
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *               news_type:
+ *                 type: string
+ *               title:
+ *                 type: string
+ *               data:
+ *                 type: string
+ *               descriptions:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: The news article was successfully updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/News'
+ *       400:
+ *         description: Bad request
+ *       404:
+ *         description: News article not found
+ */
 router.patch('/:id', upload.array('images', 5), getNews, async (req, res) => {
   if (req.files && req.files.length > 0) {
-    // Аналогично, лучше сохранить в /uploads/news/... для фронтенда
     res.news.images = req.files.map(file => `/uploads/news/${file.filename}`);
   }
   if (req.body.news_type != null) {
@@ -96,21 +208,80 @@ router.patch('/:id', upload.array('images', 5), getNews, async (req, res) => {
   }
 });
 
-// ===== DELETE News =====
+/**
+ * @swagger
+ * /news/{id}:
+ *   delete:
+ *     summary: Delete a news article by ID
+ *     tags: [News]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The ID of the news article
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: The news article was successfully deleted
+ *       404:
+ *         description: News article not found
+ *       500:
+ *         description: Error deleting news article
+ */
 router.delete('/:id', async (req, res) => {
   try {
     const deletedNews = await NewsWTC.findByIdAndDelete(req.params.id);
     if (!deletedNews) {
       return res.status(404).json({ message: 'News article not found' });
     }
-    // Можете добавить логику удаления файлов из "./uploads/news/" 
-    // (if нужно, см. пример в productRoutes)
-
     res.status(200).json({ message: 'News article deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     News:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: The unique identifier of the news article
+ *         images:
+ *           type: array
+ *           items:
+ *             type: string
+ *             description: The URL of the image
+ *         news_type:
+ *           type: string
+ *           description: The type of the news article
+ *         title:
+ *           type: string
+ *           description: The title of the news article
+ *         data:
+ *           type: string
+ *           description: The date of the news article
+ *         descriptions:
+ *           type: string
+ *           description: The descriptions of the news article
+ *       required:
+ *         - images
+ *         - news_type
+ *         - title
+ *         - data
+ *         - descriptions
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: News
+ *   description: News management operations
+ */
 
 // ===== GET News Middleware =====
 async function getNews(req, res, next) {

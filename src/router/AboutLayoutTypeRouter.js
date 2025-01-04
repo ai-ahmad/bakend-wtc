@@ -4,12 +4,17 @@ const TypeLayoutAbout = require('../models/AboutTypeModels'); // Ensure this pat
 
 const router = express.Router();
 
+/**
+ * @route POST /api/v1/about-type/create
+ * @desc Create a new AboutType
+ * @access Public
+ */
 router.post('/create', async (req, res) => {
-    console.log('Request Body:', req.body);  // Log the incoming request body to the console
+    console.log('Request Body:', req.body); // Log the incoming request body to the console
     try {
         const { type } = req.body;
 
-        // Ensure type is provided
+        // Ensure 'type' field is provided
         if (!type) {
             return res.status(400).json({ message: "Type is required" });
         }
@@ -19,13 +24,16 @@ router.post('/create', async (req, res) => {
 
         res.status(201).json({ message: "TypeLayoutAbout created successfully", data: newLayout });
     } catch (error) {
-        console.error('Error details:', error);  // Log the full error for debugging
+        console.error('Error details:', error); // Log the full error for debugging
         res.status(500).json({ message: "Error creating TypeLayoutAbout", error: error.message });
     }
 });
 
-
-// Get all AboutTypes
+/**
+ * @route GET /api/v1/about-type
+ * @desc Get all AboutTypes
+ * @access Public
+ */
 router.get('', async (req, res) => {
     try {
         const aboutTypes = await TypeLayoutAbout.find();
@@ -36,7 +44,11 @@ router.get('', async (req, res) => {
     }
 });
 
-// Get a single AboutType by ID
+/**
+ * @route GET /api/v1/about-type/:id
+ * @desc Get a single AboutType by ID
+ * @access Public
+ */
 router.get('/about-type/:id', async (req, res) => {
     const { id } = req.params;
     try {
@@ -51,7 +63,11 @@ router.get('/about-type/:id', async (req, res) => {
     }
 });
 
-// Update an AboutType by ID
+/**
+ * @route PUT /api/v1/about-type/:id
+ * @desc Update an AboutType by ID
+ * @access Public
+ */
 router.put('/about-type/:id', async (req, res) => {
     const { id } = req.params;
     const { type } = req.body;
@@ -68,7 +84,11 @@ router.put('/about-type/:id', async (req, res) => {
     }
 });
 
-// Delete an AboutType by ID
+/**
+ * @route DELETE /api/v1/about-type/:id
+ * @desc Delete an AboutType by ID
+ * @access Public
+ */
 router.delete('/about-type/:id', async (req, res) => {
     const { id } = req.params;
     try {

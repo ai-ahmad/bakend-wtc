@@ -10,6 +10,153 @@ const router = express.Router();
 const productImageDir = './uploads/product';
 const pdfDir = './uploads/pdf';
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Product:
+ *       type: object
+ *       required:
+ *         - name
+ *         - category
+ *         - price
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: The auto-generated ID of the product
+ *         name:
+ *           type: string
+ *           description: The name of the product
+ *         category:
+ *           type: string
+ *           description: The category of the product
+ *         price:
+ *           type: number
+ *           description: The price of the product
+ *         rating:
+ *           type: number
+ *           description: The rating of the product
+ *         volume:
+ *           type: number
+ *           description: The volume of the product
+ *         description:
+ *           type: string
+ *           description: The description of the product
+ *         discount_price:
+ *           type: number
+ *           description: The discounted price of the product
+ *         promotion:
+ *           type: boolean
+ *           description: Whether the product is on promotion
+ *         stock:
+ *           type: number
+ *           description: The stock of the product
+ *         ruler:
+ *           type: string
+ *           description: The ruler of the product
+ *         oils_type:
+ *           type: string
+ *           description: The type of oils in the product
+ *         image:
+ *           type: object
+ *           properties:
+ *             main_images:
+ *               type: array
+ *               items:
+ *                 type: string
+ *               description: Main images of the product
+ *             all_images:
+ *               type: array
+ *               items:
+ *                 type: string
+ *               description: All images of the product
+ *         product_info_pdf:
+ *           type: string
+ *           description: The path to the product information PDF
+ *       example:
+ *         id: "61b6c56e8f1d8e6c0dfab829"
+ *         name: "Sample Product"
+ *         category: "Category A"
+ *         price: 99.99
+ *         rating: 4.5
+ *         volume: 1.5
+ *         description: "This is a sample product."
+ *         discount_price: 79.99
+ *         promotion: true
+ *         stock: 50
+ *         ruler: "Sample Ruler"
+ *         oils_type: "Synthetic"
+ *         image:
+ *           main_images: ["/uploads/product/123-main.jpg"]
+ *           all_images: ["/uploads/product/123-main.jpg", "/uploads/product/123-other.jpg"]
+ *         product_info_pdf: "/uploads/pdf/123-info.pdf"
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Products
+ *   description: The product managing API
+ */
+
+// ========== CREATE Product ==========
+/**
+ * @swagger
+ * /products/create:
+ *   post:
+ *     summary: Create a new product
+ *     tags: [Products]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               category:
+ *                 type: string
+ *               rating:
+ *                 type: number
+ *               price:
+ *                 type: number
+ *               volume:
+ *                 type: number
+ *               description:
+ *                 type: string
+ *               discount_price:
+ *                 type: number
+ *               promotion:
+ *                 type: boolean
+ *               stock:
+ *                 type: number
+ *               ruler:
+ *                 type: string
+ *               oils_type:
+ *                 type: string
+ *               all_images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *               main_images:
+ *                 type: string
+ *                 format: binary
+ *               product_info_pdf:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       201:
+ *         description: The product was successfully created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Product'
+ *       500:
+ *         description: Error creating product
+ */
+
 // Создаём (если нет)
 if (!fs.existsSync(productImageDir)) {
   fs.mkdirSync(productImageDir, { recursive: true });
@@ -41,7 +188,7 @@ router.post('/create', upload.fields([
   { name: 'main_images', maxCount: 1 },
   { name: 'product_info_pdf', maxCount: 1 },
 ]), async (req, res) => {
-  const { name, category, rating, price, volume, description, discount_price, promotion, stock, ruler, oils_type, fidbek } = req.body;
+  const { name, category, rating, price, volume, description, discount_price, promotion, stock, ruler, oils_type } = req.body;
 
   const allImages = req.files['all_images']
     ? req.files['all_images'].map(file => `/uploads/product/${file.filename}`)
@@ -63,7 +210,6 @@ router.post('/create', upload.fields([
       stock,
       ruler,
       description,
-      fidbek,
       image: {
         main_images: mainImages,
         all_images: allImages,
@@ -82,6 +228,31 @@ router.post('/create', upload.fields([
 });
 
 // ========== READ Product by ID ==========
+/**
+ * @swagger
+ * /products/{id}:
+ *   get:
+ *     summary: Get a product by ID
+ *     tags: [Products]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The product ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: The product was found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Product'
+ *       404:
+ *         description: Product not found
+ *       500:
+ *         description: Error fetching product
+ */
 router.get('/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -93,6 +264,24 @@ router.get('/:id', async (req, res) => {
 });
 
 // ========== READ all Products ==========
+/**
+ * @swagger
+ * /products:
+ *   get:
+ *     summary: Get all products
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: List of all products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Product'
+ *       500:
+ *         description: Error fetching products
+ */
 router.get('/', async (req, res) => {
   try {
     const products = await Product.find();
@@ -103,80 +292,144 @@ router.get('/', async (req, res) => {
 });
 
 // ========== UPDATE Product by ID ==========
+/**
+ * @swagger
+ * /products/{id}:
+ *   put:
+ *     summary: Update an existing product
+ *     tags: [Products]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The product ID
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               category:
+ *                 type: string
+ *               rating:
+ *                 type: number
+ *               price:
+ *                 type: number
+ *               volume:
+ *                 type: number
+ *               description:
+ *                 type: string
+ *               discount_price:
+ *                 type: number
+ *               promotion:
+ *                 type: boolean
+ *               stock:
+ *                 type: number
+ *               ruler:
+ *                 type: string
+ *               oils_type:
+ *                 type: string
+ *               all_images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *               main_images:
+ *                 type: string
+ *                 format: binary
+ *               product_info_pdf:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: The product was successfully updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Product'
+ *       404:
+ *         description: Product not found
+ *       500:
+ *         description: Error updating product
+ */
 router.put('/:id', upload.fields([
   { name: 'all_images', maxCount: 10 },
   { name: 'main_images', maxCount: 1 },
-  { name: 'product_info_pdf', maxCount: 1 }
+  { name: 'product_info_pdf', maxCount: 1 },
 ]), async (req, res) => {
-  const { id } = req.params;
   const { name, category, rating, price, volume, description, discount_price, promotion, stock, ruler, oils_type } = req.body;
 
-  // Новые файлы, если пришли
   const allImages = req.files['all_images']
     ? req.files['all_images'].map(file => `/uploads/product/${file.filename}`)
-    : null;
+    : [];
   const mainImages = req.files['main_images']
     ? req.files['main_images'].map(file => `/uploads/product/${file.filename}`)
-    : null;
+    : [];
   const productInfoPdf = req.files['product_info_pdf']
     ? `/uploads/pdf/${req.files['product_info_pdf'][0].filename}`
-    : null;
+    : '';
 
   try {
-    const updatedProduct = await Product.findByIdAndUpdate(
-      id,
-      {
-        name,
-        category,
-        rating,
-        price,
-        volume,
-        description,
-        discount_price,
-        promotion,
-        stock,
-        ruler,
-        oils_type,
-        // Если массив allImages пришёл, обновим image.all_images
-        ...(allImages && { 'image.all_images': allImages }),
-        ...(mainImages && { 'image.main_images': mainImages }),
-        ...(productInfoPdf && { product_info_pdf: productInfoPdf }),
+    const product = await Product.findByIdAndUpdate(req.params.id, {
+      name,
+      category,
+      rating,
+      price,
+      volume,
+      stock,
+      ruler,
+      description,
+      image: {
+        main_images: mainImages,
+        all_images: allImages,
       },
-      { new: true, omitUndefined: true }
-    );
+      product_info_pdf: productInfoPdf,
+      discount_price,
+      promotion,
+      oils_type,
+    }, { new: true });
 
-    if (!updatedProduct) return res.status(404).json({ message: 'Product not found' });
-    res.status(200).json({ message: 'Product updated successfully', product: updatedProduct });
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+    res.status(200).json({ message: 'Product updated successfully', product });
   } catch (error) {
     res.status(500).json({ message: 'Error updating product', error: error.message });
   }
 });
 
-// ========== DELETE Product by ID ==========
+// ========== DELETE Product ==========
+/**
+ * @swagger
+ * /products/{id}:
+ *   delete:
+ *     summary: Delete a product by ID
+ *     tags: [Products]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The product ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: The product was successfully deleted
+ *       404:
+ *         description: Product not found
+ *       500:
+ *         description: Error deleting product
+ */
 router.delete('/:id', async (req, res) => {
   try {
-    const deletedProduct = await Product.findByIdAndDelete(req.params.id);
-    if (!deletedProduct) return res.status(404).json({ message: 'Product not found' });
-
-    // При желании можно удалить связанные картинки/пдф с диска
-    // если вы храните их пути в deletedProduct.image.all_images, deletedProduct.image.main_images, deletedProduct.product_info_pdf
-
-    res.status(200).json({ message: 'Product deleted successfully', product: deletedProduct });
+    const product = await Product.findByIdAndDelete(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+    res.status(200).json({ message: 'Product deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting product', error: error.message });
-  }
-});
-
-// ========== FILTER Products by Category ==========
-router.get('/filters', async (req, res) => {
-  const { category_name } = req.query;
-  try {
-    const products = category_name && category_name !== 'all'
-      ? await Product.find({ category: category_name })
-      : await Product.find();
-    res.status(200).json({ data: products });
-  } catch (err) {
-    res.status(500).json({ message: 'Error getting data', error: err.message });
   }
 });
 

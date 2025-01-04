@@ -7,6 +7,50 @@ const User = require('../models/UserModels');
 const router = express.Router();
 
 // Route: POST /auth/login
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     description: Login a user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User logged in successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     username:
+ *                       type: string
+ *                     role:
+ *                       type: string
+ *       400:
+ *         description: Bad request (missing body)
+ *       404:
+ *         description: User not found
+ *       401:
+ *         description: Invalid password
+ *       500:
+ *         description: Server error
+ */
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
@@ -30,6 +74,34 @@ router.post('/login', async (req, res) => {
 });
 
 // Route: POST /auth/create-partnyor
+/**
+ * @swagger
+ * /auth/create-partnyor:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     description: Create a new partner user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: User created successfully
+ *       400:
+ *         description: Missing required fields or invalid data
+ *       500:
+ *         description: Server error
+ */
 router.post('/create-partnyor', async (req, res) => {
     const { username, password, role } = req.body;
 
